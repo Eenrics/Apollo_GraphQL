@@ -86,7 +86,7 @@ const resolvers = {
   Query: {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
-    allBooks: async (root, args) => {
+    allBooks: async (root, args, {currUser}) => {
         let response = []
         if (args.author) {
           console.log(args.author)
@@ -96,8 +96,9 @@ const resolvers = {
         }
         if (args.genre) {
           let book = await Book.find({genres: args.genre}).populate('author')
-          console.log(book)
           response = response.concat(book)
+          currUser.favouriteGenre = args.genre
+          await currUser.save()
         }
         if (!args.author && !args.genre) {
           let book = await Book.find({}).populate('author')
@@ -175,7 +176,7 @@ const resolvers = {
         return  author.save()
     },
     createUser: async (root, args) => {
-      let user = new User({username: args.username})
+      let user = new User({username: args.username, favouriteGenre: ''})
 
       try {
         await user.save()

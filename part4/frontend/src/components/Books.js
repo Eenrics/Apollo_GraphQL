@@ -5,10 +5,13 @@ import { useState } from "react"
 const Books = (props) => {
 
   const [genre, setGenre] = useState(null)
-  // const [books, setBooks] = useState([])
   const [genreList, setGenreList] = useState(null)
-
-  const result = useQuery(ALL_BOOKS)
+  
+  const result = useQuery(ALL_BOOKS, {
+    variables: {
+      genre
+    }
+  })
   if (!props.show) {
     return null
   }
@@ -24,8 +27,6 @@ const Books = (props) => {
   }
   if (!genreList) setGenreList(Array.from(genres))
 
-  const bookToShow = genre ? books.filter(b => b.genres.includes(genre)) : books
-
   return (
     <div>
       <h2>books</h2>
@@ -37,7 +38,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {bookToShow.map((a) => (
+          {books.map((a) => (
             <tr key={a.title}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
@@ -47,7 +48,9 @@ const Books = (props) => {
         </tbody>
       </table>
       {
-        genreList ? genreList.map(genre => <button key={genre} onClick={() => setGenre(genre)}>{genre}</button>) : null
+        props.token ? (
+          genreList ? genreList.map(genre => <button key={genre} onClick={() => setGenre(genre)}>{genre}</button>) : null
+        ) : null
       }
     </div>
   )
